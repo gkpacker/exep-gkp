@@ -15,20 +15,21 @@ class Api::V1::PostsController < ApplicationController
     if @post.save
       render json: @post, status: :created
     else
-      render json: @post, status: :unprocessable_entity
+      render json: @post.errors, status: :unprocessable_entity
     end
   end
 
   def update
     if @post.update(post_params)
-      render json: @post, status: :updated
+      render json: @post, status: :ok
     else
-      render json: @post, status: :unprocessable_entity
+      render json: @post.errors, status: :unprocessable_entity
     end
   end
 
   def destroy
     @post.destroy
+    head :no_content
   end
 
   private
