@@ -59,14 +59,14 @@ export default class Connector {
       .then((data) => {
         if (this.hasError) {
           if (this.handleError) {
-            this.handleError()
+            this.handleError(data)
           }
         } else {
           if (this.handleSuccess) {
-            this.handleSuccess()
+            this.handleSuccess(data)
           }
         }
-        console.log(data);
+        // console.log(data);
       });
       return this
   }
