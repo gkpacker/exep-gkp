@@ -9,5 +9,7 @@
 
 // console.log('Hello World from Webpacker')
 import PostService from "../services/post";
+import CommentService from "../services/comment";
 
 window.posts = new PostService();
+window.comments = (id) => new CommentService(id);
