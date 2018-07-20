@@ -1,37 +1,99 @@
 export default class Connector {
   constructor() {
-    this.data = {}
-    this.apiUrl = '/api'
-    this.apiVersion = '/v1'
+    this.data = {};
+    this.apiUrl = '/api';
+    this.apiVersion = '/v1';
+    this.defaultHeaders = {
+      'credentials': "same-origin",
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    };
+    this.successStatus = [200, 201, 204, 101, 304];
+    this.hasError = false;
   }
 
   setData(data){
     this.data = data
   }
 
-  doRequest(method, url){
-    fetch(`${apiUrl}${apiVersion}${url}`, { method })
-      .then(response => response.json())
+  verifyStatus(status){
+    this.hasError = !this.successStatus.includes(status);
+  }
+
+  onSuccess(callback){
+    if (callback) {
+     this.handleSuccess = callback
+    }
+    return this
+  }
+
+  onFail(callback){
+    if (callback) {
+      this.handleError = callback
+    }
+    return this
+  }
+
+  buildParams(method){
+    const params = {
+      method: method,
+      headers: this.defaultHeaders,
+    }
+
+    if(method == 'POST' || method == 'PATCH'){
+      params['body']= JSON.stringify(this.data);
+    }
+    return params
+  }
+
+  buildUrl(url){
+    return `${this.apiUrl}${this.apiVersion}${url}`
+  }
+
+  doRequest(params, url){
+    fetch(url, params)
+      .then(response => {
+        this.verifyStatus(response.status)
+        return response.json()
+      })
       .then((data) => {
+        if (this.hasError) {
+          if (this.handleError) {
+            this.handleError()
+          }
+        } else {
+          if (this.handleSuccess) {
+            this.handleSuccess()
+          }
+        }
         console.log(data);
       });
+      return this
   }
 
-  get(url){
-    doRequest('GET', url)
+  get(path){
+    const params = this.buildParams('GET')
+    const url = this.buildUrl(path)
+    return this.doRequest(params, url)
   }
 
-  post(url, data){
-    setData(data);
-    doRequest('POST', url);
+  post(path, data){
+    this.setData(data);
+    const params = this.buildParams('POST')
+    const url = this.buildUrl(path)
+    return this.doRequest(params, url);
   }
 
-  patch(url, data){
-    setData(data);
-    doRequest('PATCH', url);
+  patch(path, data){
+    this.setData(data);
+    const params = this.buildParams('PATCH')
+    const url = this.buildUrl(path)
+    return this.doRequest(params, url);
   }
 
-  delete(url){
-    doRequest('DELETE', url);
+  delete(path){
+    const params = this.buildParams('DELETE')
+    const url = this.buildUrl(path)
+    return this.doRequest(params, url);
   }
 }

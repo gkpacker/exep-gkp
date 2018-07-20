@@ -11,4 +11,3 @@
 import PostService from "../services/post";
 
 window.posts = new PostService();
-console.log("teste");
