@@ -12,3 +12,13 @@
   post.content = Faker::Lorem.sentence
   post.save
 end
+
+4.times do
+  Post.all.each do |post|
+    comment = Comment.new
+    comment.title = Faker::Lorem.word
+    comment.content = Faker::Lorem.sentence
+    comment.post = post
+    comment.save
+  end
+end
